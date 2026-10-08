@@ -1,0 +1,349 @@
+# Sistema Peluquería - ejecución local con Oracle Autonomous Database (Wallet)
+# Los secretos generales se leen desde .env
+
+services:
+
+  eureka:
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    container_name: peluqueria-eureka
+    ports:
+      - "8761:8761"
+    environment:
+      PORT: 8761
+      RENDER_EXTERNAL_HOSTNAME: eureka
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - peluqueria-net
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: peluqueria-auth
+    ports:
+      - "8086:8086"
+    environment:
+      PORT: 8086
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-900000}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  cliente:
+    build:
+      context: ./cliente
+      dockerfile: Dockerfile
+    container_name: peluqueria-cliente
+    ports:
+      - "8084:8084"
+    environment:
+      PORT: 8084
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  profesional:
+    build:
+      context: ./profesional
+      dockerfile: Dockerfile
+    container_name: peluqueria-profesional
+    ports:
+      - "8082:8082"
+    environment:
+      PORT: 8082
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  tipoServicio:
+    build:
+      context: ./tipoServicio
+      dockerfile: Dockerfile
+    container_name: peluqueria-tiposervicio
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  disponibilidadProfesional:
+    build:
+      context: ./disponibilidadProfesional
+      dockerfile: Dockerfile
+    container_name: peluqueria-disponibilidadprofesional
+    ports:
+      - "8083:8083"
+    environment:
+      PORT: 8083
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  producto:
+    build:
+      context: ./producto
+      dockerfile: Dockerfile
+    container_name: peluqueria-producto
+    ports:
+      - "8088:8088"
+    environment:
+      PORT: 8088
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  bodega:
+    build:
+      context: ./bodega
+      dockerfile: Dockerfile
+    container_name: peluqueria-bodega
+    ports:
+      - "8089:8089"
+    environment:
+      PORT: 8089
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  notificacion:
+    build:
+      context: ./notificacion
+      dockerfile: Dockerfile
+    container_name: peluqueria-notificacion
+    ports:
+      - "8093:8093"
+    environment:
+      PORT: 8093
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  agenda:
+    build:
+      context: ./agenda
+      dockerfile: Dockerfile
+    container_name: peluqueria-agenda
+    ports:
+      - "8085:8085"
+    environment:
+      PORT: 8085
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  registro:
+    build:
+      context: ./registro
+      dockerfile: Dockerfile
+    container_name: peluqueria-registro
+    ports:
+      - "8087:8087"
+    environment:
+      PORT: 8087
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  kardex:
+    build:
+      context: ./kardex
+      dockerfile: Dockerfile
+    container_name: peluqueria-kardex
+    ports:
+      - "8090:8090"
+    environment:
+      PORT: 8090
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  boleta:
+    build:
+      context: ./boleta
+      dockerfile: Dockerfile
+    container_name: peluqueria-boleta
+    ports:
+      - "8091:8091"
+    environment:
+      PORT: 8091
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  pago:
+    build:
+      context: ./pago
+      dockerfile: Dockerfile
+    container_name: peluqueria-pago
+    ports:
+      - "8092:8092"
+    environment:
+      PORT: 8092
+      JAVA_TOOL_OPTIONS: "-Xmx256m -XX:+UseSerialGC"
+      DB_URL: "jdbc:oracle:thin:@a6etg25wwemt8hf_high?TNS_ADMIN=/app/wallet"
+      DB_USERNAME: "PELUQUERIA"
+      DB_PASSWORD: "ClaveSegura123!"
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET en .env}
+      EUREKA_URL: http://eureka:8761/eureka/
+    volumes:
+      - ./Wallet_A6ETG25WWEMT8HFB:/app/wallet:ro
+    depends_on:
+      eureka:
+        condition: service_healthy
+    networks:
+      - peluqueria-net
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: peluqueria-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      EUREKA_URL: http://eureka:8761/eureka/
+    depends_on:
+      eureka:
+        condition: service_healthy
+      auth:
+        condition: service_started
+      agenda:
+        condition: service_started
+    networks:
+      - peluqueria-net
+
+networks:
+  peluqueria-net:
+    driver: bridge

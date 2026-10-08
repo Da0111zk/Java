@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: cliente
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@a6etg25wwemt8hfb_high?TNS_ADMIN=C:/Users/usuario/Downloads/Peluqueria-migrado/Peluqueria/Wallet_A6ETG25WWEMT8HFB
+    username: PELUQUERIA
+    password: ClaveSegura123!
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${PORT:8084}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:https://eureka-hvy0.onrender.com/eureka/}
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+    instance-id: ${spring.application.name}:${server.port}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:VGhpcyJzQVNlY3JldEtleUZvclBlbHVxdWVyaWFBcHBsaWNhdGlvblNhZmVSYW5kb21TdHJpbmc=}
