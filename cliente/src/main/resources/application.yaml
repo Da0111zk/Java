@@ -3,9 +3,16 @@ spring:
     name: cliente
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:@a6etg25wwemt8hfb_high?TNS_ADMIN=C:/Users/usuario/Downloads/Peluqueria-migrado/Peluqueria/Wallet_A6ETG25WWEMT8HFB
+    url: "jdbc:oracle:thin:@a6etg25wwemt8hfb_high?TNS_ADMIN=/app/wallet"
     username: PELUQUERIA
     password: ClaveSegura123!
+    hikari:
+      connection-timeout: 30000
+      validation-timeout: 5000
+      max-lifetime: 1800000
+      idle-timeout: 600000
+      minimum-idle: 1
+      maximum-pool-size: 3
   jpa:
     database-platform: org.hibernate.dialect.OracleDialect
     hibernate:
@@ -21,10 +28,9 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:https://eureka-hvy0.onrender.com/eureka/}
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka/}
   instance:
     prefer-ip-address: true
-    hostname: localhost
     instance-id: ${spring.application.name}:${server.port}
 
 springdoc:

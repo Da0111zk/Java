@@ -1,120 +1,91 @@
-server:
-  port: ${PORT:8080}
-
 spring:
   application:
     name: gateway
   cloud:
     gateway:
       server:
-        webmvc:
+        webflux:
           routes:
-
-            - id: administrador-service
-              uri: lb://administrador
+            - id: cliente
+              uri: lb://cliente
               predicates:
-                - Path=/api/administrador/**
-
-            - id: agenda-service
+                - Path=/api/cliente/**
+            - id: profesional
+              uri: lb://profesional
+              predicates:
+                - Path=/api/profesional/**
+            - id: tipoServicio
+              uri: lb://tipoServicio
+              predicates:
+                - Path=/api/tipoServicio/**
+            - id: disponibilidad
+              uri: lb://disponibilidadProfesional
+              predicates:
+                - Path=/api/disponibilidad/**
+            - id: agenda
               uri: lb://agenda
               predicates:
                 - Path=/api/agenda/**
 
-            - id: disponibilidad-service
-              uri: lb://disponibilidadProfesional
-              predicates:
-                - Path=/api/disponibilidad/**
-
-            - id: cliente-service
-              uri: lb://cliente
-              predicates:
-                - Path=/api/cliente/**
-
-            - id: profesional-service
-              uri: lb://profesional
-              predicates:
-                - Path=/api/profesional/**
-
-            - id: tipo-servicio-service
-              uri: lb://tipoServicio
-              predicates:
-                - Path=/api/tiposervicio/**
-
-            - id: auth-service
-              uri: lb://auth
-              predicates:
-                - Path=/auth/**
-
-            - id: registro-service
-              uri: lb://registro
-              predicates:
-                - Path=/api/registro/**
-
-            - id: producto-service
-              uri: lb://producto
-              predicates:
-                - Path=/api/producto/**
-
-            - id: bodega-service
-              uri: lb://bodega
-              predicates:
-                - Path=/api/bodega/**
-
-            - id: kardex-service
-              uri: lb://kardex
-              predicates:
-                - Path=/api/kardex/**
-
-            - id: boleta-service
-              uri: lb://boleta
-              predicates:
-                - Path=/api/boleta/**
-
-            - id: pago-service
-              uri: lb://pago
-              predicates:
-                - Path=/api/pago/**
-
-            - id: notificacion-service
-              uri: lb://notificacion
-              predicates:
-                - Path=/api/notificacion/**
-
-            ## Swagger routes
-            - id: agenda-swagger
-              uri: lb://agenda
-              predicates:
-                - Path=/agenda/v3/api-docs
-
-            - id: cliente-swagger
+            - id: cliente-docs
               uri: lb://cliente
               predicates:
                 - Path=/cliente/v3/api-docs
-
-            - id: disponibilidad-swagger
-              uri: lb://disponibilidadProfesional
-              predicates:
-                - Path=/disponibilidadProfesional/v3/api-docs
-
-            - id: profesional-swagger
+              filters:
+                - RewritePath=/cliente/(?<segment>.*), /$\{segment}
+            - id: profesional-docs
               uri: lb://profesional
               predicates:
                 - Path=/profesional/v3/api-docs
-
-            - id: tipo-servicio-swagger
+              filters:
+                - RewritePath=/profesional/(?<segment>.*), /$\{segment}
+            - id: tipoServicio-docs
               uri: lb://tipoServicio
               predicates:
                 - Path=/tipoServicio/v3/api-docs
+              filters:
+                - RewritePath=/tipoServicio/(?<segment>.*), /$\{segment}
+            - id: disponibilidadProfesional-docs
+              uri: lb://disponibilidadProfesional
+              predicates:
+                - Path=/disponibilidadProfesional/v3/api-docs
+              filters:
+                - RewritePath=/disponibilidadProfesional/(?<segment>.*), /$\{segment}
+            - id: agenda-docs
+              uri: lb://agenda
+              predicates:
+                - Path=/agenda/v3/api-docs
+              filters:
+                - RewritePath=/agenda/(?<segment>.*), /$\{segment}
+
+server:
+  port: ${PORT:8080}
 
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka/}
   instance:
     prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Cliente
+        url: /cliente/v3/api-docs
+      - name: Profesional
+        url: /profesional/v3/api-docs
+      - name: Tipo de Servicio
+        url: /tipoServicio/v3/api-docs
+      - name: Disponibilidad Profesional
+        url: /disponibilidadProfesional/v3/api-docs
+      - name: Agenda
+        url: /agenda/v3/api-docs
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info
